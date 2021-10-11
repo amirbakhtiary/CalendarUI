@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
+using CalendarUI.Domain.Entities;
 using CalendarUI.Models;
+using CalendarUI.Service.Command;
 using CalendarUI.Service.Query;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -56,6 +58,46 @@ namespace CalendarUI.Controllers
                     Id = id
                 });
             return PartialView("_AppointmentDetail", appointment);
+        }
+
+        public async Task<ActionResult<Appointment>> CreateAppointment(CreateAppointmentModel createAppointmentModel)
+        {
+            try
+            {
+                return await _mediator.Send(new CreateAppointmentCommand
+                {
+                    appointment = _mapper.Map<Appointment>(createAppointmentModel)
+                });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        public async Task<ActionResult<Appointment>> UpdateAppointment(UpdateAppointmentModel updateAppointmentModel)
+        {
+            try
+            {
+                var appointment = await _mediator.Send(new GetAppointmentByIdQuery
+                {
+                    Id = updateAppointmentModel.Id
+                });
+
+                if (appointment == null)
+                {
+                    return BadRequest($"No appointment found with the id {updateAppointmentModel.Id}");
+                }
+
+                return await _mediator.Send(new UpdateAppointmentCommand
+                {
+                    appointment = _mapper.Map(updateAppointmentModel, appointment)
+                });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
     }
 }
