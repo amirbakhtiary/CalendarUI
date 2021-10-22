@@ -39,6 +39,8 @@ namespace CalendarUI
             }
             app.UpdateDatabase();
 
+            app.UseMiniProfiler();
+
             app.UseStaticFiles();
 
             app.UseRouting();
