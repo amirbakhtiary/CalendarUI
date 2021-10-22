@@ -60,14 +60,23 @@ namespace CalendarUI.Controllers
             return PartialView("_AppointmentDetail", appointment);
         }
 
+        [HttpGet]
+        public IActionResult CreateAppointment()
+        {
+            return PartialView("_CreateAppointment");
+        }
+
+        [HttpPost]
         public async Task<ActionResult<Appointment>> CreateAppointment(CreateAppointmentModel createAppointmentModel)
         {
             try
             {
-                return await _mediator.Send(new CreateAppointmentCommand
+                await _mediator.Send(new CreateAppointmentCommand
                 {
                     appointment = _mapper.Map<Appointment>(createAppointmentModel)
                 });
+
+                return RedirectToAction("Index");
             }
             catch (Exception ex)
             {
@@ -75,7 +84,21 @@ namespace CalendarUI.Controllers
             }
         }
 
-        public async Task<ActionResult<Appointment>> UpdateAppointment(UpdateAppointmentModel updateAppointmentModel)
+        [HttpGet]
+        public async Task<IActionResult> EditAppointment(Guid id)
+        {
+            var appointment = await _mediator.Send(
+                new GetAppointmentByIdQuery
+                {
+                    Id = id
+                });
+            var updateAppointmentModel = _mapper.Map<UpdateAppointmentModel>(appointment);
+
+            return PartialView("_EditAppointment", updateAppointmentModel);
+        }
+
+        [HttpPost]
+        public async Task<ActionResult<Appointment>> EditAppointment(UpdateAppointmentModel updateAppointmentModel)
         {
             try
             {
@@ -89,10 +112,12 @@ namespace CalendarUI.Controllers
                     return BadRequest($"No appointment found with the id {updateAppointmentModel.Id}");
                 }
 
-                return await _mediator.Send(new UpdateAppointmentCommand
+                await _mediator.Send(new UpdateAppointmentCommand
                 {
                     appointment = _mapper.Map(updateAppointmentModel, appointment)
                 });
+
+                return RedirectToAction("Index");
             }
             catch (Exception ex)
             {

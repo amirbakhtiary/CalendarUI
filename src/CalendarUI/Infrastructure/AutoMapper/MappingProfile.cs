@@ -14,6 +14,9 @@ namespace CalendarUI.Infrastructure.AutoMapper
 
             CreateMap<UpdateAppointmentModel, Appointment>()
                 .ForMember(x => x.AttendeesList, opt => opt.MapFrom(src => src.Attendees));
+
+            CreateMap<Appointment, UpdateAppointmentModel>()
+                .ForMember(x => x.Attendees, opt => opt.MapFrom(src => src.AttendeesList));
         }
     }
 }
