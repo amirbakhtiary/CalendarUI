@@ -33,6 +33,7 @@ namespace CalendarUI.Data.Test.Repository
 
         [Theory]
         [InlineData("Changed")]
+        [InlineData("Updated")]
         public async void UpdateAppointmentAsync_WhenAppointmentIsNotNull_ShouldReturnAppointment(string description)
         {
             var appointment = Context.Appointments.First();
